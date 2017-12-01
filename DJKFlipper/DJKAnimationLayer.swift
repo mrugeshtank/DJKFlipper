@@ -15,6 +15,11 @@ struct AnimationProperties {
     var endFlipAngle: CGFloat
 }
 
+enum FlipOrientation {
+    case horizontal
+    case vertical
+}
+
 enum FlipDirection {
     case left
     case right
