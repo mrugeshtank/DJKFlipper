@@ -23,11 +23,12 @@ open class DJKFlipperView: UIView {
 
     //MARK: - Property Declarations
 
+    fileprivate var flipOrientation: FlipOrientation
     var viewControllerSnapShots: [UIImage?] = []
     open var dataSource: DJKFlipperDataSource?
 
     lazy var staticView: DJKStaticView = {
-        let view = DJKStaticView(frame: self.frame)
+        let view = DJKStaticView(frame: self.frame, flipOrientation: self.flipOrientation)
         return view
     }()
 
@@ -37,13 +38,21 @@ open class DJKFlipperView: UIView {
     var animatingLayers: [DJKAnimationLayer] = []
 
     //MARK: - Initialization
-
-    override init(frame: CGRect) {
+    
+    init(flipOrientation: FlipOrientation) {
+        self.flipOrientation = flipOrientation
+        super.init(frame: .zero)
+        initHelper()
+    }
+    
+    init(frame: CGRect, flipOrientation: FlipOrientation) {
+        self.flipOrientation = flipOrientation
         super.init(frame: frame)
         initHelper()
     }
 
     required public init?(coder aDecoder: NSCoder) {
+        flipOrientation = .horizontal
         super.init(coder: aDecoder)
         initHelper()
     }
