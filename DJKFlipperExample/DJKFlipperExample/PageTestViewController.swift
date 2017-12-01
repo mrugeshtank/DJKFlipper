@@ -10,11 +10,23 @@ import UIKit
 
 class PageTestViewController: UIViewController {
 
-    @IBOutlet weak var backgroundImage: UIImageView!
+    var backgroundImage: UIImageView!
+    
+    init() {
+        backgroundImage = UIImageView()
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        backgroundImage.frame = CGRect(x: 0, y: 0, width: view.frame.width, height: view.frame.height)
+        view.addSubview(backgroundImage)
+        view.backgroundColor = .red
         // Do any additional setup after loading the view.
     }
 

@@ -9,11 +9,9 @@
 /* Begin PBXBuildFile section */
 		D62ECBC81B598D4F00A1A39A /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D62ECBC71B598D4F00A1A39A /* AppDelegate.swift */; };
 		D62ECBCA1B598D4F00A1A39A /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D62ECBC91B598D4F00A1A39A /* ViewController.swift */; };
-		D62ECBCD1B598D4F00A1A39A /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D62ECBCB1B598D4F00A1A39A /* Main.storyboard */; };
 		D62ECBD21B598D4F00A1A39A /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = D62ECBD01B598D4F00A1A39A /* LaunchScreen.xib */; };
 		D62ECBDE1B598D4F00A1A39A /* DJKFlipperExampleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D62ECBDD1B598D4F00A1A39A /* DJKFlipperExampleTests.swift */; };
 		D62ECBF51B5990AD00A1A39A /* PageTestViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D62ECBF31B5990AD00A1A39A /* PageTestViewController.swift */; };
-		D62ECBF61B5990AD00A1A39A /* PageTestViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = D62ECBF41B5990AD00A1A39A /* PageTestViewController.xib */; };
 		D62ECBF71B5991D300A1A39A /* DJKFlipper.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D62ECBED1B598DDB00A1A39A /* DJKFlipper.framework */; };
 		D62ECBF91B5991E600A1A39A /* DJKFlipper.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = D62ECBED1B598DDB00A1A39A /* DJKFlipper.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		D62ECBFB1B59922000A1A39A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D62ECBFA1B59922000A1A39A /* Images.xcassets */; };
@@ -61,14 +59,12 @@
 		D62ECBC61B598D4F00A1A39A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		D62ECBC71B598D4F00A1A39A /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		D62ECBC91B598D4F00A1A39A /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
-		D62ECBCC1B598D4F00A1A39A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		D62ECBD11B598D4F00A1A39A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LaunchScreen.xib; sourceTree = "<group>"; };
 		D62ECBD71B598D4F00A1A39A /* DJKFlipperExampleTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DJKFlipperExampleTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		D62ECBDC1B598D4F00A1A39A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		D62ECBDD1B598D4F00A1A39A /* DJKFlipperExampleTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DJKFlipperExampleTests.swift; sourceTree = "<group>"; };
 		D62ECBE71B598DDB00A1A39A /* DJKFlipper.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = DJKFlipper.xcodeproj; path = ../DJKFlipper.xcodeproj; sourceTree = "<group>"; };
 		D62ECBF31B5990AD00A1A39A /* PageTestViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PageTestViewController.swift; sourceTree = "<group>"; };
-		D62ECBF41B5990AD00A1A39A /* PageTestViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = PageTestViewController.xib; sourceTree = "<group>"; };
 		D62ECBFA1B59922000A1A39A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -116,8 +112,6 @@
 				D62ECBC71B598D4F00A1A39A /* AppDelegate.swift */,
 				D62ECBC91B598D4F00A1A39A /* ViewController.swift */,
 				D62ECBF31B5990AD00A1A39A /* PageTestViewController.swift */,
-				D62ECBF41B5990AD00A1A39A /* PageTestViewController.xib */,
-				D62ECBCB1B598D4F00A1A39A /* Main.storyboard */,
 				D62ECBFA1B59922000A1A39A /* Images.xcassets */,
 				D62ECBD01B598D4F00A1A39A /* LaunchScreen.xib */,
 				D62ECBC51B598D4F00A1A39A /* Supporting Files */,
@@ -265,10 +259,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D62ECBCD1B598D4F00A1A39A /* Main.storyboard in Resources */,
 				D62ECBFB1B59922000A1A39A /* Images.xcassets in Resources */,
 				D62ECBD21B598D4F00A1A39A /* LaunchScreen.xib in Resources */,
-				D62ECBF61B5990AD00A1A39A /* PageTestViewController.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -311,14 +303,6 @@
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
-		D62ECBCB1B598D4F00A1A39A /* Main.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				D62ECBCC1B598D4F00A1A39A /* Base */,
-			);
-			name = Main.storyboard;
-			sourceTree = "<group>";
-		};
 		D62ECBD01B598D4F00A1A39A /* LaunchScreen.xib */ = {
 			isa = PBXVariantGroup;
 			children = (
