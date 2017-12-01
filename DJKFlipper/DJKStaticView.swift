@@ -27,8 +27,8 @@ class DJKStaticView: CATransformLayer {
         var lSide = CALayer(layer: self)
         
         var frame = self.bounds
-        frame.size.width = frame.size.width / 2
-        frame.origin.x = 0
+        frame.size.height = frame.size.height / 2
+        frame.origin.y = 0
         lSide.frame = frame
         lSide.contentsScale = UIScreen.main.scale
         lSide.backgroundColor = UIColor.black.cgColor
@@ -39,8 +39,8 @@ class DJKStaticView: CATransformLayer {
     lazy var rightSide:CALayer = {
         var rSide = CALayer(layer: self)
         var frame = self.bounds
-        frame.size.width = frame.size.width / 2
-        frame.origin.x = frame.size.width
+        frame.size.height = frame.size.height / 2
+        frame.origin.y = frame.size.height
         rSide.frame = frame
         rSide.contentsScale = UIScreen.main.scale
         rSide.backgroundColor = UIColor.black.cgColor
@@ -67,17 +67,17 @@ class DJKStaticView: CATransformLayer {
     fileprivate func updatePageLayerFrames(_ newFrame:CGRect) {
         var frame = newFrame
         
-        frame.size.width = frame.size.width / 2
+        frame.size.height = frame.size.height / 2
         leftSide.frame = frame
         
-        frame.origin.x = frame.size.width
+        frame.origin.y = frame.size.height
         rightSide.frame = frame
     }
     
     func setTheRightSide(_ image:UIImage) {
         
         let tmpImageRef = image.cgImage
-        let rightImgRef = tmpImageRef?.cropping(to: CGRect(x: image.size.width/2 * UIScreen.main.scale, y: 0, width: image.size.width/2 * UIScreen.main.scale, height: image.size.height * UIScreen.main.scale))
+        let rightImgRef = tmpImageRef?.cropping(to: CGRect(x: 0, y: image.size.height / 2 * UIScreen.main.scale, width: image.size.width * UIScreen.main.scale, height: image.size.height / 2 * UIScreen.main.scale))
         
         CATransaction.begin()
         CATransaction.setAnimationDuration(0)
@@ -88,7 +88,7 @@ class DJKStaticView: CATransformLayer {
     func setTheLeftSide(_ image:UIImage) {
         let tmpImageRef = image.cgImage
         
-        let leftImgRef = tmpImageRef?.cropping(to: CGRect(x: 0, y: 0, width: image.size.width/2 * UIScreen.main.scale, height: image.size.height * UIScreen.main.scale))
+        let leftImgRef = tmpImageRef?.cropping(to: CGRect(x: 0, y: 0, width: image.size.width * UIScreen.main.scale, height: image.size.height / 2 * UIScreen.main.scale))
         
         CATransaction.begin()
         CATransaction.setAnimationDuration(0)

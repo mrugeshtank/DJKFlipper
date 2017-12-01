@@ -34,6 +34,7 @@ open class DJKFlipperView: UIView {
     var flipperState = FlipperState.inactive
     var activeView:UIView?
     var currentPage = 0
+    var visiblePage = 0
     var animatingLayers:[DJKAnimationLayer] = []
     
     //MARK: - Initialization
@@ -97,8 +98,12 @@ open class DJKFlipperView: UIView {
     
     func pan(_ gesture:UIPanGestureRecognizer) {
         
-        let translation = gesture.translation(in: gesture.view!).x
-        let progress = translation / gesture.view!.bounds.size.width
+        let translation = gesture.translation(in: gesture.view!).y
+        let progress = translation / gesture.view!.bounds.size.height
+        
+        if translation > 0 && visiblePage == 0 || translation < 0 && visiblePage == (dataSource?.numberOfPages(self) ?? 0) - 1 {
+            return
+        }
         
         switch (gesture.state) {
         case .began:
@@ -131,7 +136,7 @@ open class DJKFlipperView: UIView {
             
             //if an animation has a lower zPosition then it will not be visible throughout the entire animation cycle
             if let hiZAnimLayer = getHighestZIndexDJKAnimationLayer() {
-                animationLayer.zPosition = hiZAnimLayer.zPosition + animationLayer.bounds.size.height
+                animationLayer.zPosition = hiZAnimLayer.zPosition + animationLayer.bounds.size.width
             } else {
                 animationLayer.zPosition = 0
             }
@@ -142,7 +147,7 @@ open class DJKFlipperView: UIView {
     
     //MARK: Pan Began Helpers
     
-    func checkIfAnimationsArePassedHalfway() -> Bool{
+    func checkIfAnimationsArePassedHalfway() -> Bool {
         var passedHalfWay = false
         
         if flipperState == FlipperState.inactive {
@@ -153,11 +158,11 @@ open class DJKFlipperView: UIView {
                 let animationLayer = animLayer as DJKAnimationLayer
                 var layerIsPassedHalfway = false
                 
-                let rotationX = animationLayer.presentation()?.value(forKeyPath: "transform.rotation.x") as! CGFloat
+                let rotationY = animationLayer.presentation()?.value(forKeyPath: "transform.rotation.y") as! CGFloat
                 
-                if animationLayer.flipDirection == .right && rotationX > 0 {
+                if animationLayer.flipDirection == .right && rotationY > 0 {
                     layerIsPassedHalfway = true
-                } else if animationLayer.flipDirection == .left && rotationX == 0 {
+                } else if animationLayer.flipDirection == .left && rotationY == 0 {
                     layerIsPassedHalfway = true
                 }
                 
@@ -200,6 +205,7 @@ open class DJKFlipperView: UIView {
             currentDJKAnimationLayer.flipAnimationStatus = .completing
             
             if didFlipToNewPage(currentDJKAnimationLayer, gesture: gesture, translation: translation) == true {
+                visiblePage = currentPage
                 setUpForFlip(currentDJKAnimationLayer, progress: 1.0, animated: true, clearFlip: true)
             } else {
                 if currentDJKAnimationLayer.isFirstOrLastPage == false {
@@ -514,7 +520,7 @@ open class DJKFlipperView: UIView {
     func performFlipWithDJKAnimationLayer(_ animationLayer:DJKAnimationLayer, duration:CGFloat, clearFlip:Bool) {
         var t = CATransform3DIdentity
         t.m34 = 1.0/850
-        t = CATransform3DRotate(t, animationLayer.flipProperties.currentAngle, 0, 1, 0)
+        t = CATransform3DRotate(t, animationLayer.flipProperties.currentAngle, 1, 0, 0)
         
         CATransaction.begin()
         CATransaction.setAnimationDuration(CFTimeInterval(duration))

@@ -83,13 +83,13 @@
 		D62ECB931B59892C00A1A39A /* DJKFlipper */ = {
 			isa = PBXGroup;
 			children = (
+				D62ECBAD1B5989E500A1A39A /* DJKFlipperView.swift */,
+				D62ECBAF1B5989E500A1A39A /* DJKStaticView.swift */,
 				D62ECBAE1B5989E500A1A39A /* DJKAnimationLayer.swift */,
 				D62ECBB11B5989E500A1A39A /* DJKArrayHelper.swift */,
 				D62ECB961B59892C00A1A39A /* DJKFlipper.h */,
 				D62ECBB21B5989E500A1A39A /* DJKFlipperConstants.swift */,
-				D62ECBAD1B5989E500A1A39A /* DJKFlipperView.swift */,
 				D62ECBB01B5989E500A1A39A /* DJKScreenShotExtension.swift */,
-				D62ECBAF1B5989E500A1A39A /* DJKStaticView.swift */,
 				D62ECB941B59892C00A1A39A /* Supporting Files */,
 			);
 			path = DJKFlipper;

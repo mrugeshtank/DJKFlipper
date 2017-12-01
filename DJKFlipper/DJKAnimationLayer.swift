@@ -42,7 +42,7 @@ class DJKAnimationLayer: CATransformLayer {
         var fLayer = CALayer(layer: self)
         fLayer.frame = self.bounds
         fLayer.isDoubleSided = false
-        fLayer.transform = CATransform3DMakeRotation(CGFloat.pi, 0, 1.0, 0)
+        fLayer.transform = CATransform3DMakeRotation(CGFloat.pi, 1.0, 0, 0)
         fLayer.backgroundColor = UIColor.black.cgColor
 
         self.addSublayer(fLayer)
@@ -54,7 +54,7 @@ class DJKAnimationLayer: CATransformLayer {
         var bLayer = CALayer(layer: self)
         bLayer.frame = self.bounds
         bLayer.isDoubleSided = false
-        bLayer.transform = CATransform3DMakeRotation(0, 0, 1.0, 0)
+        bLayer.transform = CATransform3DMakeRotation(0, 1, 0, 0)
         bLayer.backgroundColor = UIColor.green.cgColor
 
         self.addSublayer(bLayer)
@@ -64,7 +64,7 @@ class DJKAnimationLayer: CATransformLayer {
     convenience init(frame: CGRect, isFirstOrLast: Bool) {
         self.init()
         self.flipAnimationStatus = FlipAnimationStatus.beginning
-        self.anchorPoint = CGPoint(x: 1.0, y: 0.5)
+        self.anchorPoint = CGPoint(x: 0.0, y: 1.0)
         self.frame = frame
 
         isFirstOrLastPage = isFirstOrLast
@@ -73,28 +73,28 @@ class DJKAnimationLayer: CATransformLayer {
     func updateFlipDirection(_ direction: FlipDirection) {
         flipDirection = direction
         if flipDirection == .left {
-            flipProperties.currentAngle = -CGFloat.pi
-            flipProperties.startAngle = -CGFloat.pi
+            flipProperties.currentAngle = CGFloat.pi
+            flipProperties.startAngle = CGFloat.pi
             flipProperties.endFlipAngle = 0
-            self.transform = CATransform3DMakeRotation(CGFloat.pi, 0, 1, 0)
+            self.transform = CATransform3DMakeRotation(-CGFloat.pi, 1, 0, 0)
         } else {
             flipProperties.currentAngle = 0
             flipProperties.startAngle = 0
-            flipProperties.endFlipAngle = -CGFloat.pi
-            self.transform = CATransform3DMakeRotation(CGFloat(0), 0, 1, 0)
+            flipProperties.endFlipAngle = CGFloat.pi
+            self.transform = CATransform3DMakeRotation(CGFloat(0), 1, 0, 0)
         }
     }
 
     func setTheFrontLayer(_ image: UIImage) {
         let tmpImageRef = image.cgImage
-        let rightImgRef = tmpImageRef?.cropping(to: CGRect(x: image.size.width / 2 * UIScreen.main.scale, y: 0, width: image.size.width / 2 * UIScreen.main.scale, height: image.size.height * UIScreen.main.scale))
+        let rightImgRef = tmpImageRef?.cropping(to: CGRect(x: 0, y: image.size.height / 2 * UIScreen.main.scale, width: image.size.width * UIScreen.main.scale, height: image.size.height / 2 * UIScreen.main.scale))
 
         frontLayer.contents = rightImgRef
     }
 
     func setTheBackLayer(_ image: UIImage) {
         let tmpImageRef = image.cgImage
-        let rightImgRef = tmpImageRef?.cropping(to: CGRect(x: 0, y: 0, width: image.size.width / 2 * UIScreen.main.scale, height: image.size.height * UIScreen.main.scale))
+        let rightImgRef = tmpImageRef?.cropping(to: CGRect(x: 0, y: 0, width: image.size.width * UIScreen.main.scale, height: image.size.height / 2 * UIScreen.main.scale))
 
         backLayer.contents = rightImgRef
     }
