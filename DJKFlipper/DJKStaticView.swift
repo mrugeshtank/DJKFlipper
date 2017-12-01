@@ -99,10 +99,10 @@ class DJKStaticView: CATransformLayer {
             setSideContent = { self.rightOrBottomSide.contents = imageReference }
         case .top:
             let imageReference = image.cgImage?.cropping(to: CGRect(x: 0, y: 0, width: image.size.width * UIScreen.main.scale, height: image.size.height / 2 * UIScreen.main.scale))
-            setSideContent = { self.rightOrBottomSide.contents = imageReference }
+            setSideContent = { self.leftOrTopSide.contents = imageReference }
         case .bottom:
-              let imageReference = image.cgImage?.cropping(to: CGRect(x: 0, y: image.size.height / 2 * UIScreen.main.scale, width: image.size.width * UIScreen.main.scale, height: image.size.height / 2 * UIScreen.main.scale))
-              setSideContent = { self.leftOrTopSide.contents = imageReference }
+            let imageReference = image.cgImage?.cropping(to: CGRect(x: 0, y: image.size.height / 2 * UIScreen.main.scale, width: image.size.width * UIScreen.main.scale, height: image.size.height / 2 * UIScreen.main.scale))
+            setSideContent = { self.rightOrBottomSide.contents = imageReference }
         }
         
         CATransaction.begin()
