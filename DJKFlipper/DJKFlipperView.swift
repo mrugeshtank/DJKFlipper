@@ -136,7 +136,7 @@ open class DJKFlipperView: UIView {
                 flipperState = .began
             }
 
-            let animationLayer = DJKAnimationLayer(frame: self.staticView.rightSide.bounds, isFirstOrLast: false)
+            let animationLayer = DJKAnimationLayer(frame: self.staticView.rightOrBottomSide.bounds, isFirstOrLast: false)
 
             //if an animation has a lower zPosition then it will not be visible throughout the entire animation cycle
             if let hiZAnimLayer = getHighestZIndexDJKAnimationLayer() {
@@ -363,17 +363,17 @@ open class DJKFlipperView: UIView {
         func setUpStaticLayerForTheDJKAnimationLayer(_ animationLayer: DJKAnimationLayer) {
             if animationLayer.flipDirection == .left {
                 if animationLayer.isFirstOrLastPage == true && animatingLayers.count <= 1 {
-                    staticView.setTheLeftSide(self.viewControllerSnapShots[currentPage]!)
+                    staticView.set(image: viewControllerSnapShots[currentPage]!, forSide: .left)
                 } else {
-                    staticView.setTheLeftSide(self.viewControllerSnapShots[currentPage - 1]!)
-                    staticView.setTheRightSide(self.viewControllerSnapShots[currentPage]!)
+                    staticView.set(image: viewControllerSnapShots[currentPage - 1]!, forSide: .left)
+                    staticView.set(image: viewControllerSnapShots[currentPage]!, forSide: .right)
                 }
             } else {
                 if animationLayer.isFirstOrLastPage == true && animatingLayers.count <= 1 {
-                    staticView.setTheRightSide(self.viewControllerSnapShots[currentPage]!)
+                    staticView.set(image: viewControllerSnapShots[currentPage]!, forSide: .right)
                 } else {
-                    staticView.setTheRightSide(self.viewControllerSnapShots[currentPage + 1]!)
-                    staticView.setTheLeftSide(self.viewControllerSnapShots[currentPage]!)
+                    staticView.set(image: viewControllerSnapShots[currentPage + 1]!, forSide: .right)
+                    staticView.set(image: viewControllerSnapShots[currentPage]!, forSide: .left)
                 }
             }
         }
@@ -552,9 +552,9 @@ open class DJKFlipperView: UIView {
                             CATransaction.begin()
                             CATransaction.setAnimationDuration(0)
                             if animationLayer.flipDirection == .left {
-                                weakSelf?.staticView.leftSide.contents = animationLayer.backLayer.contents
+                                weakSelf?.staticView.leftOrTopSide.contents = animationLayer.backLayer.contents
                             } else {
-                                weakSelf?.staticView.rightSide.contents = animationLayer.frontLayer.contents
+                                weakSelf?.staticView.rightOrBottomSide.contents = animationLayer.frontLayer.contents
                             }
                             CATransaction.commit()
                         }
@@ -568,8 +568,8 @@ open class DJKFlipperView: UIView {
                             weakSelf?.updateTheActiveView()
                             weakSelf?.staticView.removeFromSuperlayer()
                             CATransaction.flush()
-                            weakSelf?.staticView.leftSide.contents = nil
-                            weakSelf?.staticView.rightSide.contents = nil
+                            weakSelf?.staticView.leftOrTopSide.contents = nil
+                            weakSelf?.staticView.rightOrBottomSide.contents = nil
                         } else {
                             CATransaction.flush()
                         }
@@ -625,8 +625,8 @@ open class DJKFlipperView: UIView {
 
                 self.staticView.removeFromSuperlayer()
                 CATransaction.flush()
-                self.staticView.leftSide.contents = nil
-                self.staticView.rightSide.contents = nil
+                self.staticView.leftOrTopSide.contents = nil
+                self.staticView.rightOrBottomSide.contents = nil
 
                 flipperState = .inactive
             }
