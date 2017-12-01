@@ -39,13 +39,13 @@ open class DJKFlipperView: UIView {
 
     //MARK: - Initialization
     
-    init(flipOrientation: FlipOrientation) {
+    public init(flipOrientation: FlipOrientation) {
         self.flipOrientation = flipOrientation
         super.init(frame: .zero)
         initHelper()
     }
     
-    init(frame: CGRect, flipOrientation: FlipOrientation) {
+    public init(frame: CGRect, flipOrientation: FlipOrientation) {
         self.flipOrientation = flipOrientation
         super.init(frame: frame)
         initHelper()
@@ -106,9 +106,16 @@ open class DJKFlipperView: UIView {
 
     func pan(_ gesture: UIPanGestureRecognizer) {
 
-        let translation = gesture.translation(in: gesture.view!).x
-        let progress = translation / gesture.view!.bounds.size.width
-
+        let translation: CGFloat
+        let progress: CGFloat
+        if flipOrientation == .horizontal {
+            translation = gesture.translation(in: gesture.view!).x
+            progress = translation / gesture.view!.bounds.size.width
+        } else {
+            translation = gesture.translation(in: gesture.view!).y
+            progress = translation / gesture.view!.bounds.size.height
+        }
+        
         switch (gesture.state) {
         case .began:
             panBegan(gesture)
@@ -136,7 +143,7 @@ open class DJKFlipperView: UIView {
                 flipperState = .began
             }
 
-            let animationLayer = DJKAnimationLayer(frame: self.staticView.rightOrBottomSide.bounds, isFirstOrLast: false)
+            let animationLayer = DJKAnimationLayer(frame: self.staticView.rightOrBottomSide.bounds, isFirstOrLast: false, flipOrientation: flipOrientation)
 
             //if an animation has a lower zPosition then it will not be visible throughout the entire animation cycle
             if let hiZAnimLayer = getHighestZIndexDJKAnimationLayer() {
@@ -163,11 +170,13 @@ open class DJKFlipperView: UIView {
                 var layerIsPassedHalfway = false
 
                 let rotationX = animationLayer.presentation()?.value(forKeyPath: "transform.rotation.x") as! CGFloat
-
-                if animationLayer.flipDirection == .right && rotationX > 0 {
-                    layerIsPassedHalfway = true
-                } else if animationLayer.flipDirection == .left && rotationX == 0 {
-                    layerIsPassedHalfway = true
+                let rotationY = animationLayer.presentation()?.value(forKeyPath: "transform.rotation.y") as! CGFloat
+                switch animationLayer.flipDirection {
+                case .right: layerIsPassedHalfway = rotationX > 0
+                case .left: layerIsPassedHalfway = rotationX == 0
+                case .bottom: layerIsPassedHalfway = rotationY > 0
+                case .top: layerIsPassedHalfway = rotationY == 0
+                case .notSet: break
                 }
 
                 if layerIsPassedHalfway == false {
@@ -226,23 +235,34 @@ open class DJKFlipperView: UIView {
         let releaseSpeed = getReleaseSpeed(translation, gesture: gesture)
 
         var didFlipToNewPage = false
-        if animationLayer.flipDirection == .left && fabs(releaseSpeed) > DJKFlipperConstants.SpeedThreshold && !animationLayer.isFirstOrLastPage && releaseSpeed < 0 ||
-            animationLayer.flipDirection == .right && fabs(releaseSpeed) > DJKFlipperConstants.SpeedThreshold && !animationLayer.isFirstOrLastPage && releaseSpeed > 0 {
+        
+        let leftOrTop: FlipDirection = flipOrientation == .horizontal ? .left : .top
+        let rightOrBottom: FlipDirection = flipOrientation == .horizontal ? .right : .bottom
+        if animationLayer.flipDirection == leftOrTop && fabs(releaseSpeed) > DJKFlipperConstants.SpeedThreshold && !animationLayer.isFirstOrLastPage && releaseSpeed < 0 ||
+            animationLayer.flipDirection == rightOrBottom && fabs(releaseSpeed) > DJKFlipperConstants.SpeedThreshold && !animationLayer.isFirstOrLastPage && releaseSpeed > 0 {
             didFlipToNewPage = true
         }
         return didFlipToNewPage
     }
 
     func getReleaseSpeed(_ translation: CGFloat, gesture: UIPanGestureRecognizer) -> CGFloat {
-        return (translation + gesture.velocity(in: self).x / 4) / self.bounds.size.width
+        let releaseSpeed: CGFloat
+        if flipOrientation == .horizontal {
+            releaseSpeed = (translation + gesture.velocity(in: self).x / 4) / self.bounds.size.width
+        } else {
+            releaseSpeed = (translation + gesture.velocity(in: self).y / 4) / self.bounds.size.height
+        }
+        return releaseSpeed
     }
 
     func handleDidNotFlipToNewPage(_ animationLayer: DJKAnimationLayer) {
-        if animationLayer.flipDirection == .left {
-            animationLayer.flipDirection = .right
+        let leftOrTop: FlipDirection = flipOrientation == .horizontal ? .left : .top
+        let rightOrBottom: FlipDirection = flipOrientation == .horizontal ? .right : .bottom
+        if animationLayer.flipDirection == leftOrTop {
+            animationLayer.flipDirection = rightOrBottom
             self.currentPage = self.currentPage - 1
         } else {
-            animationLayer.flipDirection = .left
+            animationLayer.flipDirection = leftOrTop
             self.currentPage = self.currentPage + 1
         }
     }
@@ -292,16 +312,18 @@ open class DJKFlipperView: UIView {
 
     func getFlipDirection(_ translation: CGFloat) -> FlipDirection {
         if translation > 0 {
-            return .right
+            return flipOrientation == .horizontal ? .right : .bottom
         } else {
-            return .left
+            return flipOrientation == .horizontal ? .left : .top
         }
     }
 
     func isIncrementalSwipe(_ gesture: UIPanGestureRecognizer, animationLayer: DJKAnimationLayer) -> Bool {
 
         var incrementalSwipe = false
-        if fabs(gesture.velocity(in: self).x) < 500 || animationLayer.isFirstOrLastPage == true {
+        let velocity = flipOrientation == .horizontal ? fabs(gesture.velocity(in: self).x) : fabs(gesture.velocity(in: self).y)
+
+        if velocity < 700 || animationLayer.isFirstOrLastPage == true {
             incrementalSwipe = true
         }
 
@@ -332,10 +354,11 @@ open class DJKFlipperView: UIView {
         }
 
         func setUpDJKAnimationLayerFrontAndBack(_ animationLayer: DJKAnimationLayer) {
-            if animationLayer.flipDirection == .left {
+            let flipDirection = animationLayer.flipDirection
+            if flipDirection == .left || flipDirection == .top {
                 if self.currentPage + 1 > dataSource!.numberOfPages(self) - 1 {
                     //we are at the end
-                    animationLayer.flipProperties.endFlipAngle = -1.5
+                    animationLayer.flipProperties.endFlipAngle = flipDirection == .left ? -1.5 : 1.5
                     animationLayer.isFirstOrLastPage = true
                     animationLayer.setTheFrontLayer(self.viewControllerSnapShots[currentPage]!)
                 } else {
@@ -347,7 +370,7 @@ open class DJKFlipperView: UIView {
             } else {
                 if currentPage - 1 < 0 {
                     //we are at the end
-                    animationLayer.flipProperties.endFlipAngle = -CGFloat.pi + 1.5
+                    animationLayer.flipProperties.endFlipAngle = CGFloat(flipDirection == .right ? (-.pi + 1.5) : (.pi - 1.5))
                     animationLayer.isFirstOrLastPage = true
                     animationLayer.setTheBackLayer(viewControllerSnapShots[currentPage]!)
 
@@ -361,19 +384,21 @@ open class DJKFlipperView: UIView {
         }
 
         func setUpStaticLayerForTheDJKAnimationLayer(_ animationLayer: DJKAnimationLayer) {
-            if animationLayer.flipDirection == .left {
+            let leftOrTop: DJKStaticView.ImageSide = flipOrientation == .horizontal ? .left : .top
+            let rightOrBottom: DJKStaticView.ImageSide = flipOrientation == .horizontal ? .right : .bottom
+            if animationLayer.flipDirection == .left || animationLayer.flipDirection == .top {
                 if animationLayer.isFirstOrLastPage == true && animatingLayers.count <= 1 {
-                    staticView.set(image: viewControllerSnapShots[currentPage]!, forSide: .left)
+                    staticView.set(image: viewControllerSnapShots[currentPage]!, forSide: leftOrTop)
                 } else {
-                    staticView.set(image: viewControllerSnapShots[currentPage - 1]!, forSide: .left)
-                    staticView.set(image: viewControllerSnapShots[currentPage]!, forSide: .right)
+                    staticView.set(image: viewControllerSnapShots[currentPage - 1]!, forSide: leftOrTop)
+                    staticView.set(image: viewControllerSnapShots[currentPage]!, forSide: rightOrBottom)
                 }
             } else {
                 if animationLayer.isFirstOrLastPage == true && animatingLayers.count <= 1 {
-                    staticView.set(image: viewControllerSnapShots[currentPage]!, forSide: .right)
+                    staticView.set(image: viewControllerSnapShots[currentPage]!, forSide: rightOrBottom)
                 } else {
-                    staticView.set(image: viewControllerSnapShots[currentPage + 1]!, forSide: .right)
-                    staticView.set(image: viewControllerSnapShots[currentPage]!, forSide: .left)
+                    staticView.set(image: viewControllerSnapShots[currentPage + 1]!, forSide: rightOrBottom)
+                    staticView.set(image: viewControllerSnapShots[currentPage]!, forSide: leftOrTop)
                 }
             }
         }
@@ -456,12 +481,13 @@ open class DJKFlipperView: UIView {
         }
 
         func getOppositeAnimationDirectionFromLayer(_ animationLayer: DJKAnimationLayer) -> FlipDirection {
-            var animationLayerOppositeDirection = FlipDirection.left
-            if animationLayer.flipDirection == .left {
-                animationLayerOppositeDirection = .right
+            switch animationLayer.flipDirection {
+            case .left: return .right
+            case .right: return .left
+            case .top: return .bottom
+            case .bottom: return .top
+            case .notSet: return .left
             }
-
-            return animationLayerOppositeDirection
         }
 
         func removeDJKAnimationLayer(_ animationLayer: DJKAnimationLayer) {
@@ -485,14 +511,15 @@ open class DJKFlipperView: UIView {
 
         func reverseAnimationForLayer(_ animationLayer: DJKAnimationLayer) {
             animationLayer.flipAnimationStatus = .interrupt
-
-            if animationLayer.flipDirection == .left {
+            let leftOrTop: FlipDirection = flipOrientation == .horizontal ? .left : .top
+            let rightOrBottom: FlipDirection = flipOrientation == .horizontal ? .right : .bottom
+            if animationLayer.flipDirection == leftOrTop {
                 currentPage = currentPage - 1
-                animationLayer.updateFlipDirection(.right)
+                animationLayer.updateFlipDirection(rightOrBottom)
                 setUpForFlip(animationLayer, progress: 1.0, animated: true, clearFlip: true)
-            } else if animationLayer.flipDirection == .right {
+            } else if animationLayer.flipDirection == rightOrBottom {
                 currentPage = currentPage + 1
-                animationLayer.updateFlipDirection(.left)
+                animationLayer.updateFlipDirection(leftOrTop)
                 setUpForFlip(animationLayer, progress: 1.0, animated: true, clearFlip: true)
             }
         }
@@ -502,7 +529,9 @@ open class DJKFlipperView: UIView {
         func setUpForFlip(_ animationLayer: DJKAnimationLayer, progress: CGFloat, animated: Bool, clearFlip: Bool) {
 
             let newAngle: CGFloat = animationLayer.flipProperties.startAngle + progress * (animationLayer.flipProperties.endFlipAngle - animationLayer.flipProperties.startAngle)
-
+            print(animationLayer.flipProperties.endFlipAngle)
+            print(newAngle)
+            print(progress)
             var duration: CGFloat
 
             if animated == true {
@@ -510,7 +539,6 @@ open class DJKFlipperView: UIView {
             } else {
                 duration = 0
             }
-
             animationLayer.flipProperties.currentAngle = newAngle
 
             if animationLayer.isFirstOrLastPage == true {
@@ -523,7 +551,11 @@ open class DJKFlipperView: UIView {
         func performFlipWithDJKAnimationLayer(_ animationLayer: DJKAnimationLayer, duration: CGFloat, clearFlip: Bool) {
             var t = CATransform3DIdentity
             t.m34 = 1.0 / 850
-            t = CATransform3DRotate(t, animationLayer.flipProperties.currentAngle, 0, 1, 0)
+            if flipOrientation == .horizontal {
+                t = CATransform3DRotate(t, animationLayer.flipProperties.currentAngle, 0, 1, 0)
+            } else {
+                t = CATransform3DRotate(t, animationLayer.flipProperties.currentAngle, 1, 0, 0)
+            }
 
             CATransaction.begin()
             CATransaction.setAnimationDuration(CFTimeInterval(duration))
@@ -538,9 +570,7 @@ open class DJKFlipperView: UIView {
         }
 
         func clearFlipAfterCompletion(_ animationLayer: DJKAnimationLayer) {
-            weak var weakSelf = self
-            CATransaction.setCompletionBlock { () -> Void in
-
+            CATransaction.setCompletionBlock { [weak self] () -> Void in
                 DispatchQueue.main.async(execute: {
                     if animationLayer.flipAnimationStatus == .interrupt {
                         animationLayer.flipAnimationStatus = .completing
@@ -551,25 +581,25 @@ open class DJKFlipperView: UIView {
                         if animationLayer.isFirstOrLastPage == false {
                             CATransaction.begin()
                             CATransaction.setAnimationDuration(0)
-                            if animationLayer.flipDirection == .left {
-                                weakSelf?.staticView.leftOrTopSide.contents = animationLayer.backLayer.contents
+                            if animationLayer.flipDirection == .left || animationLayer.flipDirection == .top {
+                                self?.staticView.leftOrTopSide.contents = animationLayer.backLayer.contents
                             } else {
-                                weakSelf?.staticView.rightOrBottomSide.contents = animationLayer.frontLayer.contents
+                                self?.staticView.rightOrBottomSide.contents = animationLayer.frontLayer.contents
                             }
                             CATransaction.commit()
                         }
 
-                        weakSelf?.animatingLayers.remove(object: animationLayer)
+                        self?.animatingLayers.remove(object: animationLayer)
                         animationLayer.removeFromSuperlayer()
 
-                        if weakSelf?.animatingLayers.count == 0 {
+                        if self?.animatingLayers.count == 0 {
 
-                            weakSelf?.flipperState = .inactive
-                            weakSelf?.updateTheActiveView()
-                            weakSelf?.staticView.removeFromSuperlayer()
+                            self?.flipperState = .inactive
+                            self?.updateTheActiveView()
+                            self?.staticView.removeFromSuperlayer()
                             CATransaction.flush()
-                            weakSelf?.staticView.leftOrTopSide.contents = nil
-                            weakSelf?.staticView.rightOrBottomSide.contents = nil
+                            self?.staticView.leftOrTopSide.contents = nil
+                            self?.staticView.rightOrBottomSide.contents = nil
                         } else {
                             CATransaction.flush()
                         }
@@ -591,14 +621,24 @@ open class DJKFlipperView: UIView {
         }
 
         func setMaxAngleIfDJKAnimationLayerIsFirstOrLast(_ animationLayer: DJKAnimationLayer, newAngle: CGFloat) {
-            if animationLayer.flipDirection == .right {
+            switch animationLayer.flipDirection {
+            case .right:
                 if newAngle < -1.4 {
                     animationLayer.flipProperties.currentAngle = -1.4
                 }
-            } else {
+            case .left:
                 if newAngle > -1.8 {
                     animationLayer.flipProperties.currentAngle = -1.8
                 }
+            case .bottom:
+                if newAngle > 1.0 {
+                    animationLayer.flipProperties.currentAngle = 1.0
+                }
+            case .top:
+                if newAngle < 2.0 {
+                    animationLayer.flipProperties.currentAngle = 2.0
+                }
+            case .notSet: break
             }
         }
 
