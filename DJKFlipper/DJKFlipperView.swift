@@ -77,7 +77,9 @@ open class DJKFlipperView: UIView {
     }
 
     func updateTheActiveView() {
-
+        if viewControllerSnapShots.count > 0 {
+            currentPage = viewControllerSnapShots.count <= currentPage ? viewControllerSnapShots.count - 1 : currentPage
+        }
         if let dataSource = self.dataSource {
             if dataSource.numberOfPages(self) > 0 {
 
@@ -168,14 +170,14 @@ open class DJKFlipperView: UIView {
                 let animationLayer = animLayer as DJKAnimationLayer
                 var layerIsPassedHalfway = false
 
-                let rotationX = animationLayer.presentation()?.value(forKeyPath: "transform.rotation.x") as! CGFloat
-                let rotationY = animationLayer.presentation()?.value(forKeyPath: "transform.rotation.y") as! CGFloat
+                let rotationX = animationLayer.presentation()?.value(forKeyPath: "transform.rotation.x") as? CGFloat ?? 0
+                let rotationY = animationLayer.presentation()?.value(forKeyPath: "transform.rotation.y") as? CGFloat ?? 0
                 switch animationLayer.flipDirection {
                 case .right: layerIsPassedHalfway = rotationX > 0
                 case .left: layerIsPassedHalfway = rotationX == 0
                 case .bottom: layerIsPassedHalfway = rotationY > 0
                 case .top: layerIsPassedHalfway = rotationY == 0
-                case .notSet: break
+                case .notSet: layerIsPassedHalfway = false
                 }
 
                 if layerIsPassedHalfway == false {
