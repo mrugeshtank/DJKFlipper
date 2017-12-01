@@ -36,6 +36,7 @@ open class DJKFlipperView: UIView {
     var activeView: UIView?
     var currentPage = 0
     var animatingLayers: [DJKAnimationLayer] = []
+    public var isInteractionToNilPagesDisabled: Bool = true // for first and last page
 
     //MARK: - Initialization
     
@@ -105,7 +106,6 @@ open class DJKFlipperView: UIView {
     //MARK: - Pan Gesture States
 
     func pan(_ gesture: UIPanGestureRecognizer) {
-
         let translation: CGFloat
         let progress: CGFloat
         if flipOrientation == .horizontal {
@@ -115,7 +115,7 @@ open class DJKFlipperView: UIView {
             translation = gesture.translation(in: gesture.view!).y
             progress = translation / gesture.view!.bounds.size.height
         }
-        
+
         switch (gesture.state) {
         case .began:
             panBegan(gesture)
@@ -160,7 +160,6 @@ open class DJKFlipperView: UIView {
 
     func checkIfAnimationsArePassedHalfway() -> Bool {
         var passedHalfWay = false
-
         if flipperState == FlipperState.inactive {
             passedHalfWay = true
         } else if animatingLayers.count > 0 {
@@ -387,13 +386,13 @@ open class DJKFlipperView: UIView {
             let leftOrTop: DJKStaticView.ImageSide = flipOrientation == .horizontal ? .left : .top
             let rightOrBottom: DJKStaticView.ImageSide = flipOrientation == .horizontal ? .right : .bottom
             if animationLayer.flipDirection == .left || animationLayer.flipDirection == .top {
-                if animationLayer.isFirstOrLastPage == true && animatingLayers.count <= 1 {
+                if animationLayer.isFirstOrLastPage == true {
                     staticView.set(image: viewControllerSnapShots[currentPage]!, forSide: leftOrTop)
                 } else {
                     staticView.set(image: viewControllerSnapShots[currentPage - 1]!, forSide: leftOrTop)
                     staticView.set(image: viewControllerSnapShots[currentPage]!, forSide: rightOrBottom)
                 }
-            } else {
+            } else if animationLayer.flipDirection == .right || animationLayer.flipDirection == .bottom  {
                 if animationLayer.isFirstOrLastPage == true && animatingLayers.count <= 1 {
                     staticView.set(image: viewControllerSnapShots[currentPage]!, forSide: rightOrBottom)
                 } else {
@@ -529,9 +528,6 @@ open class DJKFlipperView: UIView {
         func setUpForFlip(_ animationLayer: DJKAnimationLayer, progress: CGFloat, animated: Bool, clearFlip: Bool) {
 
             let newAngle: CGFloat = animationLayer.flipProperties.startAngle + progress * (animationLayer.flipProperties.endFlipAngle - animationLayer.flipProperties.startAngle)
-            print(animationLayer.flipProperties.endFlipAngle)
-            print(newAngle)
-            print(progress)
             var duration: CGFloat
 
             if animated == true {
@@ -623,20 +619,20 @@ open class DJKFlipperView: UIView {
         func setMaxAngleIfDJKAnimationLayerIsFirstOrLast(_ animationLayer: DJKAnimationLayer, newAngle: CGFloat) {
             switch animationLayer.flipDirection {
             case .right:
-                if newAngle < -1.4 {
-                    animationLayer.flipProperties.currentAngle = -1.4
+                if newAngle < (isInteractionToNilPagesDisabled ? 0 : -1.4) {
+                    animationLayer.flipProperties.currentAngle = isInteractionToNilPagesDisabled ? 0 : -1.4
                 }
             case .left:
-                if newAngle > -1.8 {
-                    animationLayer.flipProperties.currentAngle = -1.8
+                if newAngle > (isInteractionToNilPagesDisabled ? -.pi : -1.8) {
+                    animationLayer.flipProperties.currentAngle = isInteractionToNilPagesDisabled ? -.pi : -1.8
                 }
             case .bottom:
-                if newAngle > 1.0 {
-                    animationLayer.flipProperties.currentAngle = 1.0
+                if newAngle > (isInteractionToNilPagesDisabled ? 0 : 1.0) {
+                    animationLayer.flipProperties.currentAngle = isInteractionToNilPagesDisabled ? 0 : 1.0
                 }
             case .top:
-                if newAngle < 2.0 {
-                    animationLayer.flipProperties.currentAngle = 2.0
+                if newAngle < (isInteractionToNilPagesDisabled ? .pi : 2.0) {
+                    animationLayer.flipProperties.currentAngle = isInteractionToNilPagesDisabled ? .pi : 2.0
                 }
             case .notSet: break
             }
