@@ -103,7 +103,7 @@ class DJKAnimationLayer: CATransformLayer {
         case .left:
             flipProperties.currentAngle = -.pi
             flipProperties.startAngle = -.pi
-            flipProperties.endFlipAngle = 0
+            flipProperties.endFlipAngle = 0 - 0.000001 // fixes rotation direction on swipe
             transform = CATransform3DMakeRotation(.pi, 0, 1, 0)
         case .right:
             flipProperties.currentAngle = 0
