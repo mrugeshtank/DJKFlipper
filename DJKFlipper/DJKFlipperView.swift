@@ -117,7 +117,7 @@ open class DJKFlipperView: UIView {
             translation = gesture.translation(in: gesture.view!).y
             progress = translation / gesture.view!.bounds.size.height
         }
-
+        
         switch (gesture.state) {
         case .began:
             panBegan(gesture)
@@ -177,7 +177,7 @@ open class DJKFlipperView: UIView {
                 case .left: layerIsPassedHalfway = rotationX == 0
                 case .bottom: layerIsPassedHalfway = rotationY > 0
                 case .top: layerIsPassedHalfway = rotationY == 0
-                case .notSet: layerIsPassedHalfway = false
+                case .notSet: layerIsPassedHalfway = true
                 }
 
                 if layerIsPassedHalfway == false {
@@ -214,8 +214,28 @@ open class DJKFlipperView: UIView {
     //MARK: Pan Gesture State Ended
 
     func panEnded(_ gesture: UIPanGestureRecognizer, translation: CGFloat) {
-
+        
         if let currentDJKAnimationLayer = animatingLayers.last {
+            if currentDJKAnimationLayer.flipDirection == .notSet {
+                    flipperState = .active
+                
+                    currentDJKAnimationLayer.updateFlipDirection(getFlipDirection(translation))
+                    
+                    if handleConflictingAnimationsWithDJKAnimationLayer(currentDJKAnimationLayer) == false {
+                        currentDJKAnimationLayer.flipAnimationStatus = .completing
+                        
+                        updateViewControllerSnapShotsWithCurrentPage(self.currentPage)
+                        setUpDJKAnimationLayerFrontAndBack(currentDJKAnimationLayer)
+                        setUpStaticLayerForTheDJKAnimationLayer(currentDJKAnimationLayer)
+                        
+                        self.layer.addSublayer(currentDJKAnimationLayer)
+                        CATransaction.flush()
+                        addDJKAnimationLayer()
+                    }
+                setUpForFlip(currentDJKAnimationLayer, progress: 1.0, animated: true, clearFlip: true)
+                return
+            }
+            
             currentDJKAnimationLayer.flipAnimationStatus = .completing
 
             if didFlipToNewPage(currentDJKAnimationLayer, gesture: gesture, translation: translation) == true {
@@ -243,6 +263,7 @@ open class DJKFlipperView: UIView {
             animationLayer.flipDirection == rightOrBottom && fabs(releaseSpeed) > DJKFlipperConstants.SpeedThreshold && !animationLayer.isFirstOrLastPage && releaseSpeed > 0 {
             didFlipToNewPage = true
         }
+
         return didFlipToNewPage
     }
 
@@ -528,10 +549,8 @@ open class DJKFlipperView: UIView {
         //MARK: - Flip Animation Methods
 
         func setUpForFlip(_ animationLayer: DJKAnimationLayer, progress: CGFloat, animated: Bool, clearFlip: Bool) {
-
             let newAngle: CGFloat = animationLayer.flipProperties.startAngle + progress * (animationLayer.flipProperties.endFlipAngle - animationLayer.flipProperties.startAngle)
             var duration: CGFloat
-
             if animated == true {
                 duration = getAnimationDurationFromDJKAnimationLayer(animationLayer, newAngle: newAngle)
             } else {
@@ -542,7 +561,6 @@ open class DJKFlipperView: UIView {
             if animationLayer.isFirstOrLastPage == true {
                 setMaxAngleIfDJKAnimationLayerIsFirstOrLast(animationLayer, newAngle: newAngle)
             }
-
             performFlipWithDJKAnimationLayer(animationLayer, duration: duration, clearFlip: clearFlip)
         }
 
