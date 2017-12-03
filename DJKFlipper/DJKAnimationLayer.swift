@@ -80,7 +80,7 @@ class DJKAnimationLayer: CATransformLayer {
         self.flipOrientation = flipOrientation
         super.init()
         flipAnimationStatus = .beginning
-        anchorPoint = flipOrientation == .horizontal ? CGPoint(x: 1.0, y: 0.5) : CGPoint(x: 0.0, y: 1.0)
+        anchorPoint = flipOrientation == .horizontal ? CGPoint(x: 1.0, y: 0.5) : CGPoint(x: 0.5, y: 1.0)
         self.frame = frame
 
         isFirstOrLastPage = isFirstOrLast
@@ -90,7 +90,7 @@ class DJKAnimationLayer: CATransformLayer {
         flipOrientation = .vertical
         super.init(layer: layer)
         flipAnimationStatus = .beginning
-        anchorPoint = flipOrientation == .horizontal ? CGPoint(x: 1.0, y: 0.5) : CGPoint(x: 0.0, y: 1.0)
+        anchorPoint = flipOrientation == .horizontal ? CGPoint(x: 1.0, y: 0.5) : CGPoint(x: 0.5, y: 1.0)
     }
     
     required init?(coder aDecoder: NSCoder) {
