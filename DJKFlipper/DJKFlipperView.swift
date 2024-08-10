@@ -24,11 +24,7 @@ open class DJKFlipperView: UIView {
     //MARK: - Property Declarations
     
     var viewControllerSnapShots:[UIImage?] = []
-    open var dataSource:DJKFlipperDataSource? {
-        didSet {
-            reload()
-        }
-    }
+    open var dataSource:DJKFlipperDataSource?
     
     lazy var staticView:DJKStaticView = {
         let view = DJKStaticView(frame: self.frame)
@@ -582,11 +578,13 @@ open class DJKFlipperView: UIView {
     
     open func reload() {
         updateTheActiveView()
-        //set an array with capacity for total amount of possible pages
+
         viewControllerSnapShots.removeAll(keepingCapacity: false)
-        
-        guard let datasource = dataSource else { return }
-        for _ in 1...datasource.numberOfPages(self) {
+        guard let dataSource = dataSource else { return }
+
+        //set an array with capacity for total amount of possible pages
+        for _ in 0..<dataSource.numberOfPages(self)
+        {
             viewControllerSnapShots.append(nil)
         }
     }
