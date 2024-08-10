@@ -55,16 +55,16 @@ open class DJKFlipperView: UIView {
     }
     
     func initHelper() {
-        NotificationCenter.default.addObserver(self, selector: #selector(DJKFlipperView.deviceOrientationDidChangeNotification), name: NSNotification.Name.UIDeviceOrientationDidChange, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(DJKFlipperView.clearAnimations), name: NSNotification.Name.UIApplicationWillResignActive, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(DJKFlipperView.deviceOrientationDidChangeNotification), name: UIDevice.orientationDidChangeNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(DJKFlipperView.clearAnimations), name: UIApplication.willResignActiveNotification, object: nil)
         
         let panGesture = UIPanGestureRecognizer(target: self, action: #selector(DJKFlipperView.pan(_:)))
         addGestureRecognizer(panGesture)
     }
     
     deinit {
-        NotificationCenter.default.removeObserver(self, name: NSNotification.Name.UIApplicationWillResignActive, object: nil)
-        NotificationCenter.default.removeObserver(self, name: NSNotification.Name.UIDeviceOrientationDidChange, object: nil)
+        NotificationCenter.default.removeObserver(self, name: UIApplication.willResignActiveNotification, object: nil)
+        NotificationCenter.default.removeObserver(self, name: UIDevice.orientationDidChangeNotification, object: nil)
     }
     
     override open func layoutSubviews() {
@@ -87,8 +87,8 @@ open class DJKFlipperView: UIView {
         //set up the constraints
         self.activeView?.translatesAutoresizingMaskIntoConstraints = false
         let viewDictionary = ["activeView" : activeView]
-        let constraintTop = NSLayoutConstraint.constraints(withVisualFormat: "V:|-0-[activeView]-0-|", options: NSLayoutFormatOptions.alignAllTop, metrics: nil, views: viewDictionary)
-        let constraintLeft = NSLayoutConstraint.constraints(withVisualFormat: "H:|-0-[activeView]-0-|", options: NSLayoutFormatOptions.alignAllLeft, metrics: nil, views: viewDictionary)
+        let constraintTop = NSLayoutConstraint.constraints(withVisualFormat: "V:|-0-[activeView]-0-|", options: NSLayoutConstraint.FormatOptions.alignAllTop, metrics: nil, views: viewDictionary)
+        let constraintLeft = NSLayoutConstraint.constraints(withVisualFormat: "H:|-0-[activeView]-0-|", options: NSLayoutConstraint.FormatOptions.alignAllLeft, metrics: nil, views: viewDictionary)
         
         addConstraints(constraintTop)
         addConstraints(constraintLeft)
@@ -114,6 +114,8 @@ open class DJKFlipperView: UIView {
             print("Failed")
         case .possible:
             print("Possible")
+        @unknown default:
+            print("Unknown")
         }
     }
     
